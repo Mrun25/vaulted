@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>TapChart</title>
+<style>
+:root{--teal:#0f766e;--teal2:#14b8a6;--bg:#f4f8f7;--card:#fff;--ink:#12302d;--mute:#5b7370;--line:#dbe6e4;--warn:#b45309;--bad:#b91c1c;--r:16px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;font:18px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
+header{background:var(--teal);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+header b{font-size:20px}header small{opacity:.85;font-size:13px}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:26px;margin:8px 0 6px}h2{font-size:20px;margin:18px 0 8px}
+p{margin:6px 0}.mute{color:var(--mute);font-size:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:12px 0}
+button,.btn{font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px 18px;background:var(--teal);color:#fff;width:100%;margin:6px 0;cursor:pointer;min-height:52px}
+button.sec{background:#e3efed;color:var(--teal)}button.ghost{background:none;color:var(--mute);font-weight:500}
+button.danger{background:#fde8e8;color:var(--bad)}button.sm{width:auto;padding:8px 14px;min-height:40px;font-size:15px;margin:0}
+input,select,textarea{font:inherit;width:100%;padding:13px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);margin:6px 0}
+label.f{display:block;font-size:15px;color:var(--mute);margin-top:8px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav a{flex:1;text-align:center;padding:10px 2px;font-size:13px;color:var(--mute);text-decoration:none;font-weight:600}
+nav a span{display:block;height:26px}nav a svg{vertical-align:middle}nav a.on{color:var(--teal)}
+.chip{display:inline-block;background:#e3efed;color:var(--teal);border-radius:99px;padding:4px 12px;margin:3px 4px 3px 0;font-size:15px;font-weight:600}
+.chip.w{background:#fef3c7;color:var(--warn)}.chip.g{background:#e5e7eb;color:#4b5563}.chip.r{background:#fde8e8;color:var(--bad)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.row .t{flex:1}.row .t small{display:block;color:var(--mute);font-size:14px}
+.sw{position:relative;width:54px;height:32px;flex:none}.sw input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;z-index:2}
+.sw i{position:absolute;inset:0;background:#cbd5d3;border-radius:99px;transition:.2s}.sw i:after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked+i{background:var(--teal)}.sw input:checked+i:after{left:25px}
+.bubble{background:#fff;border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:14px;margin:10px 0;font-size:19px}
+.prog{height:6px;background:#dbe6e4;border-radius:9px;overflow:hidden;margin:6px 0 12px}.prog div{height:100%;background:var(--teal2)}
+.code{font-size:64px;letter-spacing:10px;font-weight:800;text-align:center;color:var(--teal);margin:8px 0}
+.ok{width:84px;height:84px;border-radius:50%;background:var(--teal);color:#fff;font-size:48px;display:flex;align-items:center;justify-content:center;margin:12px auto}
+.sens{border-left:4px solid var(--warn)}
+.banner{background:#fef3c7;color:#78350f;border-radius:12px;padding:10px 14px;font-size:15px;margin:10px 0}
+.tag{display:flex;gap:8px;margin:8px 0}.tag button{flex:1}
+table{width:100%;border-collapse:collapse}td{padding:10px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.big{font-size:30px;font-weight:800;color:var(--teal);letter-spacing:4px}
+
+:root{--teal:#0b0f0e;--lime:#d4f24a;--lime2:#c3e43a;--bg:#f6f7f4;--ink:#0b0f0e;--mute:#6b7571;--line:#e6e9e4;--r:24px}
+body{background:#e9ede4;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+#app,header,nav{max-width:440px;margin-left:auto;margin-right:auto}
+body:before{content:"";position:fixed;inset:0;background:#e9ede4;z-index:-1}
+main{max-width:440px;background:var(--bg);min-height:100vh;padding:16px 18px 100px;box-shadow:0 0 60px #0001}
+header{background:var(--bg);color:var(--ink);padding:16px 20px 6px;position:sticky;top:0;z-index:5}
+.logo{display:flex;align-items:center;gap:8px}.logo i{width:22px;height:22px;border-radius:50%;background:var(--lime);border:5px solid var(--ink);display:block}.logo b{font-size:20px;letter-spacing:-.3px}
+#mode{background:var(--ink);color:var(--lime);border-radius:99px;padding:5px 12px;font-weight:600}
+header{display:flex}header{max-width:440px;left:0;right:0;background:var(--bg)}
+h1{font-size:28px;letter-spacing:-.6px;line-height:1.15}h2{font-size:19px}
+.card{border:0;border-radius:var(--r);box-shadow:0 6px 24px #0b0f0e0f}
+button,.btn{background:var(--lime);color:var(--ink);border-radius:99px;font-weight:700;min-height:56px}
+button.sec{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+button.ghost{background:none;color:var(--mute);box-shadow:none}button.danger{background:#fde8e8;color:var(--bad)}
+button.circ{width:56px;height:56px;min-height:56px;border-radius:50%;background:var(--ink);padding:0;display:flex;align-items:center;justify-content:center;margin:0}
+input,select,textarea{border:0;border-radius:99px;padding:15px 20px;background:#fff;box-shadow:0 4px 16px #0b0f0e0d}
+.chip{background:#eef3dc;color:var(--ink);font-weight:600}.chip.g{background:#eceeea;color:#555}
+.sw input:checked+i{background:var(--ink)}.sw input:checked+i:after{background:var(--lime)}
+.bubble{border:0;border-radius:24px 24px 24px 6px;box-shadow:0 6px 24px #0b0f0e0f}
+.prog div{background:var(--ink)}.prog{background:#e0e5da}
+.code{color:var(--ink);background:var(--lime);border-radius:24px;padding:14px 0}
+.ok{background:var(--lime);color:var(--ink);border:5px solid var(--ink)}
+.big{color:var(--ink);background:var(--lime);border-radius:14px;padding:0 12px}
+nav{position:fixed;left:0;right:0;bottom:12px;background:var(--ink);border:0;border-radius:99px;width:calc(100% - 28px);max-width:412px;padding:6px;box-shadow:0 10px 30px #0b0f0e55}
+nav a{color:#9aa49f;border-radius:99px;font-size:11px;padding:7px 2px}nav a.on{background:var(--lime);color:var(--ink)}
+.banner{background:#f4f9d6;color:#3b4410;border-radius:16px}
+.sens{border-left:0;box-shadow:inset 4px 0 0 var(--warn),0 6px 24px #0b0f0e0f}
+.hid{background:var(--lime);color:var(--ink)!important;border-radius:28px;padding:22px;margin:6px 0 16px;position:relative;overflow:hidden}
+.hid:after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;border:26px solid #0b0f0e12}
+.hid .al{display:inline-block;background:var(--ink);color:var(--lime);border-radius:99px;padding:4px 12px;margin:3px 6px 0 0;font-size:14px;font-weight:600}
+.intro{display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
+.ill{background:var(--lime);border-radius:32px;padding:26px 14px;margin:10px 0 18px;display:flex;align-items:center;min-height:250px}
+.introtxt{flex:1;display:flex;flex-direction:column}.dots{display:flex;gap:6px;margin:14px 0}.dots i{width:8px;height:8px;border-radius:9px;background:#d5dacf}.dots i.on{width:22px;background:var(--ink)}
+.introbar{display:flex;justify-content:space-between;align-items:center;margin-top:auto}.introbar .sm{font-size:16px}
+#splash{position:fixed;inset:0;background:var(--lime);z-index:50;display:flex;align-items:center;justify-content:center}
+#splash .logo i{width:34px;height:34px;border-width:8px;background:var(--lime)}#splash .logo b{font-size:40px;letter-spacing:-1px}
+/* ---- motion ---- */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #d4f24a99}100%{box-shadow:0 0 0 16px #d4f24a00}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes scan{0%{top:6px}50%{top:calc(100% - 10px)}100%{top:6px}}
+@keyframes slidein{from{transform:translateY(-120%)}to{transform:none}}
+#app>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+#app.still>*{animation:none}
+button{transition:transform .12s,background .2s,box-shadow .2s}button:active{transform:scale(.97)}
+.card{transition:transform .2s,box-shadow .2s}a.card:active,.tile:active{transform:scale(.98)}
+.sw i,.sw i:after{transition:.25s cubic-bezier(.3,.7,.3,1)}
+.code,.ok{animation:pop .6s cubic-bezier(.2,.9,.3,1.2) both}
+.ok{animation-delay:.05s}.code{animation-delay:.25s}
+.pulse{animation:pulse 2s infinite}
+.spark .ln{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s .2s ease forwards}
+.rg{transition:stroke-dasharray 1s}.ringsvg .rg{animation:draw 1.2s ease both;stroke-dasharray:100 100}
+.open{animation:rise .3s both}
+.pre{cursor:pointer;padding:9px 16px;transition:.2s}
+nav a{transition:background .25s,color .25s}
+#toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,20px);background:#0b0f0e;color:#d4f24a;padding:12px 18px;border-radius:99px;font-size:15px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#push{position:fixed;top:10px;left:50%;transform:translate(-50%,-140%);width:calc(100% - 28px);max-width:412px;background:#fff;border-radius:22px;padding:14px;display:flex;gap:12px;box-shadow:0 12px 40px #0b0f0e40;z-index:70;transition:transform .45s cubic-bezier(.2,.9,.3,1.1);font-size:15px}
+#push.show{transform:translate(-50%,0)}#push .pi{width:38px;height:38px;border-radius:10px;background:var(--lime);display:flex;align-items:center;justify-content:center;flex:none}#push .pi i{width:16px;height:16px;border-radius:50%;border:4px solid #0b0f0e;display:block}
+/* ---- components ---- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.tile{background:#fff;border-radius:24px;padding:16px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 24px #0b0f0e0f;transition:transform .2s}
+.tile b{font-size:17px}.tile small{color:var(--mute);font-size:13px;line-height:1.3}
+.tile svg{background:var(--lime);border-radius:14px;padding:9px;width:46px;height:46px}
+.rowlink{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:var(--ink)}.rowlink span{font-size:26px;color:var(--mute)}
+.seg{display:flex;background:#e9ede4;border-radius:99px;padding:4px;margin:10px 0}.seg button{flex:1;margin:0;min-height:42px;background:none;color:var(--mute);font-weight:700;box-shadow:none;font-size:15px}.seg button.on{background:var(--ink);color:var(--lime)}
+.bk{display:inline-block;color:var(--mute);text-decoration:none;font-weight:600;margin:4px 0}
+.flexc{display:flex;gap:14px;align-items:center}
+.bars{display:flex;align-items:flex-end;gap:4px;height:52px;margin:8px 0}.bars i{flex:1;background:var(--ink);border-radius:4px;animation:grow .7s both;transform-origin:bottom}.bars i.lo{background:#d9a441}
+@keyframes grow{from{transform:scaleY(0)}}
+.dose.taken{background:#f4f9d6}.dose.skipped{background:#fff7e6}
+.stock{height:8px;background:#e6e9e4;border-radius:9px;overflow:hidden;margin:6px 0}.stock i{display:block;height:100%;background:var(--ink);border-radius:9px;animation:draw 1s both}.stock i.lo{background:#d9a441}
+.sens2{box-shadow:inset 4px 0 0 #d9a441,0 6px 24px #0b0f0e0f}
+.ficon{width:44px;height:44px;border-radius:14px;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;margin-right:12px}
+.scanbox{position:relative;overflow:hidden;text-align:center;padding:34px 16px}.scanline{position:absolute;left:0;right:0;height:4px;background:var(--lime);box-shadow:0 0 18px var(--lime);animation:scan 1.2s infinite ease-in-out}
+.vv{font-size:26px;font-weight:800;text-align:right}.vv small{display:block;font-size:12px;color:var(--mute);font-weight:500}
+.ecard{background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 10px 30px #b91c1c22;margin:12px 0;position:relative;padding-bottom:116px}
+.ehead{background:#dc2626;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}.ehead b{letter-spacing:3px}
+.erow{padding:12px 18px;border-bottom:1px solid var(--line)}.erow small{display:block;color:var(--mute)}.erow b{font-size:19px}
+.eqr{position:absolute;right:14px;bottom:12px;text-align:center}.eqr small{display:block;font-size:11px;color:var(--mute)}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:800;margin-right:12px;flex:none}
+.prof.cur{box-shadow:inset 0 0 0 2px var(--ink)}
+.steps .st{display:flex;gap:14px;padding:10px 0}.steps i{width:32px;height:32px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;flex:none}
+.lk{display:block;color:var(--ink);font-weight:700;margin-top:10px}
+.cert{display:flex;gap:12px;background:#f4f9d6;border-radius:18px;padding:12px;margin-top:10px;animation:rise .5s both}.ck{width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;animation:pop .5s both}
+.pend{display:flex;gap:10px;align-items:center;margin-top:10px;background:#fff7e6;border-radius:16px;padding:10px 14px;font-weight:600}.pend i{width:16px;height:16px;border:3px solid #d9a441;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+.btnrow{display:flex;gap:10px}.btnrow button{margin:10px 0 0}
+.delreq{background:#fff7e6;box-shadow:inset 4px 0 0 #d9a441}
+.kpis{display:flex;gap:10px;margin:10px 0}.kpis div{flex:1;background:#f4f9d6;border-radius:16px;padding:10px;text-align:center}.kpis b{font-size:24px;display:block}.kpis small{color:var(--mute)}
+.poster{text-align:center}.poster svg{margin:14px auto;display:block}
+.recon{padding:10px 0;border-bottom:1px solid var(--line)}.seg3{display:flex;gap:6px;margin-top:6px}.seg3 button{margin:0;min-height:38px;font-size:14px;padding:6px;background:#eceeea;color:#444}.seg3 button.on{background:var(--ink);color:var(--lime)}.seg3 button.changed.on{background:#d9a441;color:#111}.seg3 button.stopped.on{background:#dc2626;color:#fff}
+.bio{text-align:center;padding:60px 0}.fp{width:130px;height:130px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pulse 1s infinite}
+textarea{width:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.seg button{padding:8px 2px;font-size:14px;white-space:nowrap;min-height:40px}.seg{overflow:hidden}</style></head><body>
+<header><div class="logo"><i></i><b>TapChart</b></div><small id="mode"></small></header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const $=s=>document.querySelector(s);
+const K='tapchart.v1';
+const blank={onboarded:false,basics:{name:'',dob:'',blood:'',phone:'',contact:''},allergies:[],medicines:[],conditions:[],surgeries:[],sensitive:[],log:[],checkins:[]};
+let MEM=null;const ls={get(){try{return localStorage.getItem(K)}catch(e){return MEM}},set(v){try{localStorage.setItem(K,v)}catch(e){MEM=v}},del(){try{localStorage.removeItem(K)}catch(e){}MEM=null}};
+const load=()=>{try{return JSON.parse(ls.get()||'{}')}catch(e){return {}}};
+let S=Object.assign(structuredClone(blank),load());
+const save=()=>ls.set(JSON.stringify(S));
+window.addEventListener('storage',()=>{S=Object.assign(structuredClone(blank),load());render()});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CLINICS=[{id:'c1',name:'Greenleaf Family Clinic',city:'Pune',ver:1},{id:'c2',name:'Smile Care Dental',city:'Pune',ver:1},{id:'c3',name:'Clear Vision Eye Centre',city:'Pune',ver:1}];
+const PRESETS={
+ general:{n:'General visit',keys:['basics','allergies','medicines','conditions']},
+ dental:{n:'Dentist',keys:['basics','allergies','medicines']},
+ eye:{n:'Eye doctor',keys:['basics','allergies','conditions']},
+ emergency:{n:'Emergency',keys:['basics','allergies','medicines','conditions','surgeries']},
+ minimal:{n:'Just my name',keys:['basics']}};
+const CAT={basics:'Basics (name, age, blood group)',allergies:'Allergies',medicines:'Current medicines',conditions:'Medical conditions',surgeries:'Past surgeries',sensitive:'Sensitive: mental, reproductive, sexual health, infections'};
+// ---- data items per category
+function items0(k){
+ const b=S.basics;
+ if(k=='basics'){const a=[];if(b.name)a.push('Name: '+b.name);if(b.dob)a.push('Age: '+age(b.dob)+' (DOB '+b.dob+')');if(b.blood)a.push('Blood group: '+b.blood);if(b.phone)a.push('Phone: '+b.phone);if(b.contact)a.push('Emergency contact: '+b.contact);return a}
+ if(k=='medicines')return S.medicines.map(m=>m.name+(m.dose?' - '+m.dose:''));
+ return S[k]||[];
+}
+function age(d){const t=new Date(d);if(isNaN(t))return'?';return Math.floor((Date.now()-t)/31557600000)}
+
+let ob={step:0},sh={},desk={};
+function setNav(r){
+ const IC={'home': 'M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z', 'share': 'M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13', 'log': 'M7 3h10a1 1 0 011 1v17l-3-2-3 2-3-2-3 2V4a1 1 0 011-1zM9 8h6M9 12h6', 'desk': 'M3 21V8l9-5 9 5v13M9 21v-6h6v6M12 8v3M10.5 9.5h3'};const sv=k=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IC[k]}"/></svg>`;const t=[['home','home','Home'],['share','share','Share'],['log','log','Access'],['desk','desk','Clinic desk']];
+ $('#nav').innerHTML=S.onboarded?t.map(x=>`<a href="#${x[0]}" class="${r.split('/')[0]==x[0]?'on':''}"><span>${sv(x[1])}</span>${x[2]}</a>`).join(''):'';
+ $('#mode').textContent=r=='desk'?'Clinic view':'Demo mode';
+}
+function render(){const r=route();setNav(r);const v=VIEWS[r.split('/')[0]]||VIEWS.home;$('#app').innerHTML=v(r);window.scrollTo(0,0);if(AFTER[r])AFTER[r]()}
+window.addEventListener('hashchange',render);
+const AFTER={};
+function expire(){const n=Date.now();let ch=0;S.checkins.forEach(c=>{if(c.status!='expired'&&c.status!='revoked'&&c.expires<n){c.status='expired';S.log.unshift({at:n,clinic:c.clinicName,act:'expired',id:c.id});ch=1}});if(ch)save()}
+
+const ILL=["<svg viewBox=\"0 0 300 220\" width=\"100%\"><rect x=\"70\" y=\"30\" width=\"160\" height=\"170\" rx=\"22\" fill=\"#fff\" stroke=\"#0b0f0e\" stroke-width=\"5\"/><rect x=\"92\" y=\"56\" width=\"116\" height=\"14\" rx=\"7\" fill=\"#d4f24a\" stroke=\"#0b0f0e\" stroke-width=\"3\"/><rect x=\"92\" y=\"84\" width=\"90\" height=\"12\" rx=\"6\" fill=\"#e5e7e4\"/><rect x=\"92\" y=\"108\" width=\"104\" height=\"12\" rx=\"6\" fill=\"#e5e7e4\"/><rect x=\"92\" y=\"132\" width=\"70\" height=\"12\" rx=\"6\" fill=\"#e5e7e4\"/><circle cx=\"196\" cy=\"168\" r=\"26\" fill=\"#d4f24a\" stroke=\"#0b0f0e\" stroke-width=\"5\"/><path d=\"M185 168l8 8 14-16\" stroke=\"#0b0f0e\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "<svg viewBox=\"0 0 300 220\" width=\"100%\"><rect x=\"95\" y=\"20\" width=\"110\" height=\"180\" rx=\"22\" fill=\"#fff\" stroke=\"#0b0f0e\" stroke-width=\"5\"/><circle cx=\"150\" cy=\"95\" r=\"34\" fill=\"#d4f24a\" stroke=\"#0b0f0e\" stroke-width=\"5\"/><path d=\"M135 95a15 15 0 0130 0M141 95a9 9 0 0118 0\" stroke=\"#0b0f0e\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><rect x=\"118\" y=\"150\" width=\"64\" height=\"12\" rx=\"6\" fill=\"#e5e7e4\"/><path d=\"M40 90q-14 20 0 40M22 78q-26 32 0 64M260 90q14 20 0 40M278 78q26 32 0 64\" stroke=\"#0b0f0e\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/></svg>", "<svg viewBox=\"0 0 300 220\" width=\"100%\"><rect x=\"40\" y=\"40\" width=\"220\" height=\"140\" rx=\"22\" fill=\"#fff\" stroke=\"#0b0f0e\" stroke-width=\"5\"/><rect x=\"60\" y=\"64\" width=\"180\" height=\"26\" rx=\"13\" fill=\"#d4f24a\" stroke=\"#0b0f0e\" stroke-width=\"4\"/><rect x=\"60\" y=\"102\" width=\"180\" height=\"26\" rx=\"13\" fill=\"#fff\" stroke=\"#0b0f0e\" stroke-width=\"4\"/><rect x=\"60\" y=\"140\" width=\"180\" height=\"26\" rx=\"13\" fill=\"#fff\" stroke=\"#0b0f0e\" stroke-width=\"4\"/><rect x=\"204\" y=\"68\" width=\"30\" height=\"18\" rx=\"9\" fill=\"#0b0f0e\"/><circle cx=\"225\" cy=\"77\" r=\"6\" fill=\"#d4f24a\"/><rect x=\"204\" y=\"106\" width=\"30\" height=\"18\" rx=\"9\" fill=\"#e5e7e4\"/><circle cx=\"213\" cy=\"115\" r=\"6\" fill=\"#fff\"/><rect x=\"204\" y=\"144\" width=\"30\" height=\"18\" rx=\"9\" fill=\"#e5e7e4\"/><circle cx=\"213\" cy=\"153\" r=\"6\" fill=\"#fff\"/></svg>"];
+const SL=[['Fill it once, never refill a clinic form again','Your history, allergies and medicines in one calm place.'],['Tap at the desk to share','Pick what the doctor needs. Nothing leaves your phone until you confirm.'],['You stay in control','Sensitive notes are off by default. Shares expire and you can revoke them.']];
+let wi=0;
+function welcomeV(){const [t,d]=SL[wi];const last=wi==SL.length-1;return `<div class="intro"><div class="ill">${ILL[wi]}</div><div class="introtxt"><h1>${t}</h1><p class=mute>${d}</p><div class="dots">${SL.map((_,i)=>`<i class="${i==wi?'on':''}"></i>`).join('')}</div>${last?`<button onclick="ob.step=0;location.hash='onboard'">Get started</button><button class=sec onclick="demo()">Explore with sample data</button><p class=mute style="text-align:center;font-size:14px">Prototype. Data stays on this device.</p>`:`<div class="introbar"><button class="ghost sm" onclick="wi=${SL.length-1};render()">Skip</button><button class="circ" aria-label="Next" onclick="wi++;render()">${ARR}</button></div>`}</div></div>`}
+const ARR='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4f24a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+// ---- onboarding
+const STEPS=[
+ {k:'basics',q:"Hi, I'm TapChart. I'll help you fill your health details once, so you never refill clinic forms. Skip anything you want - you can add it later. First, the basics."},
+ {k:'allergies',q:"Any allergies? Medicines, foods, anything that has caused a reaction. Allergies matter most in an emergency."},
+ {k:'medicines',q:"What medicines do you take regularly?"},
+ {k:'conditions',q:"Any ongoing conditions or past surgeries? For example asthma, diabetes, appendix removed."},
+ {k:'sensitive',q:"Last one, and fully private. Sensitive notes (mental, reproductive, sexual health, infections) stay switched OFF every time you share, unless you turn them on yourself."}];
+function obView(){
+ const s=STEPS[ob.step];const pr=`<div class="prog"><div style="width:${(ob.step/STEPS.length)*100}%"></div></div><p class="mute">Step ${ob.step+1} of ${STEPS.length}</p>`;
+ let f='';
+ if(s.k=='basics'){const b=S.basics;f=`<label class=f>Full name</label><input id=n value="${esc(b.name)}" autocomplete=name><label class=f>Date of birth</label><input id=d type=date value="${esc(b.dob)}"><label class=f>Blood group</label><select id=bl>${['','A+','A-','B+','B-','O+','O-','AB+','AB-'].map(x=>`<option ${b.blood==x?'selected':''}>${x}</option>`).join('')}</select><label class=f>Phone</label><input id=p type=tel value="${esc(b.phone)}"><label class=f>Emergency contact (name and number)</label><input id=ec value="${esc(b.contact)}">`}
+ else if(s.k=='medicines')f=`<label class=f>Medicine name</label><input id=mn placeholder="e.g. Metformin"><label class=f>Dose (optional)</label><input id=md placeholder="e.g. 500 mg, twice daily"><button class=sec onclick="addMed()">+ Add medicine</button><div id=lst>${S.medicines.map(m=>`<span class=chip>${esc(m.name)}</span>`).join('')}</div>`;
+ else if(s.k=='conditions')f=`<label class=f>Condition or surgery</label><input id=cv placeholder="e.g. Asthma"><div class=tag><button class=sec onclick="addList('conditions')">+ Condition</button><button class=sec onclick="addList('surgeries')">+ Surgery</button></div><div id=lst>${S.conditions.map(m=>`<span class=chip>${esc(m)}</span>`).join('')}${S.surgeries.map(m=>`<span class="chip g">${esc(m)}</span>`).join('')}</div>`;
+ else f=`<label class=f>Add a private note</label><input id=cv placeholder="Optional"><button class=sec onclick="addList('sensitive')">+ Add</button><div id=lst>${S.sensitive.map(m=>`<span class="chip w">${esc(m)}</span>`).join('')}</div>`;
+ if(s.k=='allergies')f=`<label class=f>Allergy</label><input id=cv placeholder="e.g. Penicillin"><button class=sec onclick="addList('allergies')">+ Add allergy</button><div id=lst>${S.allergies.map(m=>`<span class=chip w>${esc(m)}</span>`).join('')}</div>`;
+ return pr+`<div class=bubble>${s.q}</div><div class=card>${f}</div><button onclick="obNext(1)">${ob.step==STEPS.length-1?'Finish':'Save and continue'}</button><button class=ghost onclick="obNext(0)">Skip for now</button>`;
+}
+function addList(k){const i=$('#cv');if(!i.value.trim())return;S[k].push(i.value.trim());save();i.value='';refreshLst()}
+function addMed(){const n=$('#mn').value.trim();if(!n)return;S.medicines.push({name:n,dose:$('#md').value.trim()});save();$('#mn').value='';$('#md').value='';refreshLst()}
+function refreshLst(){const s=STEPS[ob.step].k;const L={allergies:['allergies','w'],conditions:['conditions',''],sensitive:['sensitive','w']};let h='';if(s=='medicines')h=S.medicines.map(m=>`<span class=chip>${esc(m.name)}</span>`).join('');else if(s=='conditions')h=S.conditions.map(m=>`<span class=chip>${esc(m)}</span>`).join('')+S.surgeries.map(m=>`<span class="chip g">${esc(m)}</span>`).join('');else h=S[L[s][0]].map(m=>`<span class="chip ${L[s][1]}">${esc(m)}</span>`).join('');$('#lst').innerHTML=h}
+function obNext(keep){
+ const s=STEPS[ob.step].k;
+ if(keep&&s=='basics')S.basics={name:$('#n').value.trim(),dob:$('#d').value,blood:$('#bl').value,phone:$('#p').value.trim(),contact:$('#ec').value.trim()};
+ if(ob.step<STEPS.length-1){ob.step++;save();render()}else{S.onboarded=true;save();location.hash='home';render()}
+}
+// ---- views
+const VIEWS={
+welcome(){return welcomeV()},
+welcomeOld(){return `<h1>Fill it once.<br>Tap to share.</h1><p class=mute>Record your health history one time. At any clinic, share only what the doctor needs, for a limited time, and see who looked.</p><div class=card><p>✔ You choose every item before it leaves your phone</p><p>✔ Sensitive notes are off unless you turn them on</p><p>✔ Shares expire on their own, and you can cancel them</p></div><button onclick="ob.step=0;location.hash='onboard'">Get started (about 2 minutes)</button><button class=sec onclick="demo()">Explore with sample data</button><p class=mute style="text-align:center">Demo: data stays on this device only.</p>`},
+onboard(){return obView()},
+home(){
+ expire();const b=S.basics;
+ const sec=(k,t,cls)=>{const a=items(k);return `<div class="card"><div class=row style="padding-top:0"><b>${t}</b><button class="sm sec" onclick="edit('${k}')">Edit</button></div>${a.length?a.map(x=>`<span class="chip ${cls||''}">${esc(x)}</span>`).join(''):'<p class=mute>Nothing added yet.</p>'}</div>`};
+ return `<div class=hid><small style="font-weight:700;letter-spacing:2px;opacity:.7">HEALTH ID</small><div style="font-size:28px;font-weight:800;margin:6px 0;letter-spacing:-.5px">${esc(b.name||'Add your name')}</div><div style="font-weight:600">${b.dob?age(b.dob)+' yrs':''} ${b.blood?' · Blood '+esc(b.blood):''}</div><div style="margin-top:12px">${S.allergies.map(a=>`<span class=al>${esc(a)}</span>`).join('')}</div></div>
+ <button onclick="location.hash='share'">Share with a clinic</button>
+ ${S.demo?'<div class=banner>Sample data. Nothing here is a real person or real record.</div>':''}${sec('basics','Basics')}${sec('allergies','Allergies','w')}${sec('medicines','Medicines')}${sec('conditions','Conditions')}${sec('surgeries','Past surgeries','g')}
+ <div class="card sens"><div class=row style="padding-top:0"><b>Sensitive notes</b><button class="sm sec" onclick="edit('sensitive')">Edit</button></div>${S.sensitive.length?S.sensitive.map(x=>`<span class="chip w">${esc(x)}</span>`).join(''):'<p class=mute>Nothing added.</p>'}<p class=mute>Never shared unless you switch it on for a specific visit.</p></div>
+ <button class=ghost onclick="if(confirm('Delete all data on this device?')){ls.del();S=structuredClone(blank);location.hash='welcome';render()}">Delete my data</button>`},
+share(r){
+ const p=r.split('/');
+ if(!sh.clinic)return `<h1>Share with a clinic</h1><p class=mute>At a real clinic, tapping the NFC tag or scanning their QR opens this screen. Here, pick a clinic or type a clinic code.</p>
+ <div class=card><b>Tap or scan (simulated)</b>${CLINICS.map(c=>`<div class=row><div class=t>${c.name}<small>${c.city}</small></div><span class="chip">✔ Verified</span><button class="sm" onclick="pickClinic('${c.id}')">Tap</button></div>`).join('')}</div>
+ <div class=card><label class=f>Or enter clinic code (try 1001)</label><input id=cc inputmode=numeric placeholder="4-digit clinic code"><button class=sec onclick="byCode()">Continue</button></div>`;
+ if(sh.done){const c=sh.done;return `<div class=ok>✓</div><h1 style="text-align:center">Shared with ${esc(c.clinicName)}</h1><div class=card><p class=mute style="text-align:center">Show this check-in code at the desk</p><div class=code>${c.code}</div><p class=mute style="text-align:center">Expires ${new Date(c.expires).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}</p></div><p class=mute>You can cancel any time from Access. Once a clinic has seen or printed it, we can't take it back from them.</p><button onclick="sh={};location.hash='log';render()">View access log</button><button class=sec onclick="sh={};location.hash='home';render()">Done</button>`}
+ const c=CLINICS.find(x=>x.id==sh.clinic);
+ const keys=['basics','allergies','medicines','conditions','surgeries','sensitive'];
+ const pk=sh.preset;
+ return `<h1>Check in</h1><div class=card><b>${c.name}</b> <span class=chip>✔ Verified clinic</span><p class=mute>${c.city}</p></div>
+ <h2>Who is this visit with?</h2><div>${Object.entries(PRESETS).map(([k,v])=>`<span class="chip ${pk==k?'':'g'}" style="cursor:pointer;padding:9px 16px" onclick="setPreset('${k}')">${v.n}</span>`).join('')}</div>
+ <h2>This is exactly what they will see</h2><p class=mute>Switch off anything you do not want to share.</p>
+ ${keys.map(k=>{const a=items(k);if(!a.length)return '';const on=sh.on[k];return `<div class="card ${k=='sensitive'?'sens':''}"><div class=row style="padding-top:0"><div class=t><b>${CAT[k]}</b></div><label class=sw><input type=checkbox ${on?'checked':''} onchange="tog('${k}',this.checked)"><i></i></label></div>${on?a.map(x=>`<p>• ${esc(x)}</p>`).join(''):'<p class=mute>Not shared</p>'}</div>`}).join('')}
+ <label class=f>Keep it available for</label><select onchange="sh.exp=+this.value"><option value=24 ${sh.exp==24?'selected':''}>24 hours (default)</option><option value=4 ${sh.exp==4?'selected':''}>4 hours</option><option value=168 ${sh.exp==168?'selected':''}>7 days</option></select>
+ <div class=banner>The clinic may keep what it sees or prints. Share only what you are comfortable with.</div>
+ <button onclick="confirmShare()">Confirm and share</button><button class=ghost onclick="sh={};render()">Cancel</button>`},
+log(){expire();const rows=S.log;const act=S.checkins.filter(c=>c.status=='sent'||c.status=='opened'||c.status=='reviewed');
+ return `<h1>Access log</h1><p class=mute>Who saw what, and when.</p>
+ <h2>Active shares</h2>${act.length?act.map(c=>`<div class=card><b>${esc(c.clinicName)}</b><p class=mute>Code ${c.code} - ${esc(c.presetName)} - ${c.status}<br>Expires ${new Date(c.expires).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}</p><div>${c.cats.map(k=>`<span class=chip>${k}</span>`).join('')}</div><button class=danger onclick="revoke('${c.id}')">Revoke now</button></div>`).join(''):'<p class=mute>No active shares.</p>'}
+ <h2>History</h2><div class=card>${rows.length?rows.map(l=>`<div class=row><div class=t>${esc(l.clinic)}<small>${new Date(l.at).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}</small></div><span class="chip ${l.act=='revoked'?'r':l.act=='expired'?'g':''}">${l.act}</span></div>`).join(''):'<p class=mute>Nothing yet.</p>'}</div>`},
+desk(){expire();const cl=desk.clinic||'c1';const c=CLINICS.find(x=>x.id==cl);
+ const list=S.checkins.filter(x=>x.clinic==cl&&x.status!='revoked'&&x.status!='expired');
+ const open=desk.open&&S.checkins.find(x=>x.id==desk.open&&x.status!='revoked'&&x.status!='expired');
+ if(open)return `<button class="sm sec" onclick="desk.open=null;render()">← Back</button><h1>${esc(open.bundle.basics&&open.bundle.basics[0]?open.bundle.basics[0].replace('Name: ',''):'Patient')}</h1><p class=mute>Code <b class=big>${open.code}</b> - confirm it matches the patient at your desk</p>${Object.entries(open.bundle).map(([k,a])=>`<div class="card ${k=='sensitive'?'sens':''}"><b>${CAT[k]}</b>${a.map(x=>`<p>• ${esc(x)}</p>`).join('')}</div>`).join('')}<p class=mute>Expires ${new Date(open.expires).toLocaleString()}</p><button onclick="mark('${open.id}','reviewed')">Mark reviewed</button><button class=danger onclick="discard('${open.id}')">Wrong person - discard</button>`;
+ return `<h1>Clinic desk</h1><label class=f>Viewing as</label><select onchange="desk.clinic=this.value;render()">${CLINICS.map(x=>`<option value=${x.id} ${x.id==cl?'selected':''}>${x.name}</option>`).join('')}</select><div class=banner>Demo: this view reads shares made from the Share tab on the same device.</div>
+ <h2>Incoming check-ins</h2>${list.length?list.map(x=>`<div class=card><div class=row style="padding:0"><div class=big>${x.code}</div><span class="chip ${x.status=='sent'?'w':''}">${x.status=='sent'?'new':x.status}</span></div><p class=mute>${new Date(x.at).toLocaleTimeString([], {timeStyle:'short'})} - ${esc(x.presetName)} - ${x.cats.length} categories</p><button onclick="openC('${x.id}')">Open summary</button></div>`).join(''):'<p class=mute>No check-ins waiting.</p>'}`}
+};
+// ---- actions
+function edit(k){ob.step=STEPS.findIndex(s=>s.k==k||(k=='surgeries'&&s.k=='conditions'));location.hash='edit';render()}
+VIEWS.edit=()=>{const s=STEPS[ob.step];return obView().replace(/onclick="obNext\(1\)">[^<]*/,'onclick="editDone()">Done').replace(/<button class=ghost[^>]*>Skip for now<\/button>/,'').replace(/<p class="mute">Step.*?<\/p>/,'').replace(/<div class=prog>.*?<\/div><\/div>/,'')};
+function editDone(){if(STEPS[ob.step].k=='basics')S.basics={name:$('#n').value.trim(),dob:$('#d').value,blood:$('#bl').value,phone:$('#p').value.trim(),contact:$('#ec').value.trim()};save();location.hash='home';render()}
+function pickClinic(id){sh={clinic:id,exp:24};setPreset('general')}
+function byCode(){const v=$('#cc').value.trim();const m={1001:'c1',1002:'c2',1003:'c3'}[v];if(!m){alert('Clinic code not found. Try 1001.');return}pickClinic(m)}
+function setPreset(k){sh.preset=k;sh.on={};['basics','allergies','medicines','conditions','surgeries','sensitive'].forEach(c=>sh.on[c]=PRESETS[k].keys.includes(c)&&c!='sensitive');render()}
+function tog(k,v){sh.on[k]=v;render()}
+function confirmShare(){
+ const cats=Object.keys(sh.on).filter(k=>sh.on[k]&&items(k).length);
+ if(!cats.length){alert('Nothing is switched on to share.');return}
+ if(sh.on.sensitive&&!confirm('You are sharing sensitive notes. Continue?'))return;
+ expire();let code;do{code=String(1000+Math.floor(Math.random()*9000))}while(S.checkins.some(c=>c.code==code&&c.status=='sent'));
+ const c=CLINICS.find(x=>x.id==sh.clinic);const bundle={};cats.forEach(k=>bundle[k]=items(k));
+ const ci={id:'ci'+Date.now(),clinic:c.id,clinicName:c.name,code,at:Date.now(),expires:Date.now()+sh.exp*3600000,status:'sent',presetName:PRESETS[sh.preset].n,cats:cats.map(k=>k=='basics'?'Basics':k[0].toUpperCase()+k.slice(1)),bundle};
+ S.checkins.unshift(ci);S.log.unshift({at:Date.now(),clinic:c.name,act:'sent',id:ci.id});save();sh.done=ci;render()}
+function revoke(id){const c=S.checkins.find(x=>x.id==id);if(!c||!confirm('Revoke this share? The clinic loses access immediately.'))return;c.status='revoked';c.bundle={};S.log.unshift({at:Date.now(),clinic:c.clinicName,act:'revoked',id});save();render()}
+function openC(id){const c=S.checkins.find(x=>x.id==id);if(c.status=='sent'){c.status='opened';S.log.unshift({at:Date.now(),clinic:c.clinicName,act:'opened',id});save()}desk.open=id;render()}
+function mark(id,s){const c=S.checkins.find(x=>x.id==id);c.status=s;S.log.unshift({at:Date.now(),clinic:c.clinicName,act:s,id});save();desk.open=null;render()}
+function discard(id){const c=S.checkins.find(x=>x.id==id);c.status='revoked';c.bundle={};S.log.unshift({at:Date.now(),clinic:c.clinicName,act:'discarded by clinic',id});save();desk.open=null;render()}
+function demo(){S.basics={name:'Aarohi Patil',dob:'2001-05-14',blood:'B+',phone:'+91 90000 12345',contact:'Meera Patil, +91 90000 00000'};S.allergies=['Penicillin','Peanuts'];S.medicines=[{name:'Cetirizine',dose:'10 mg, at night'},{name:'Vitamin D3',dose:'60,000 IU weekly'}];S.conditions=['Mild asthma'];S.surgeries=['Appendix removed (2019)'];S.sensitive=['Anxiety, on counselling'];S.onboarded=true;S.demo=true;save();location.hash='home';render()}
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+// ================= FEATURE PACK (demo) =================
+const DAY=86400000,HR=3600000;
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const fmtD=t=>new Date(t).toLocaleDateString([], {day:'numeric',month:'short'});
+const fmtDT=t=>new Date(t).toLocaleString([], {day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+Object.assign(CAT,{vitals:'Health summaries (averages only, no raw data)',documents:'Documents you attach'});
+PRESETS.general.keys.push('vitals');PRESETS.emergency.keys.push('documents');PRESETS.eye.keys.push('documents');
+const SHARE_KEYS=['basics','allergies','medicines','conditions','surgeries','vitals','documents','sensitive'];
+// ---- i18n (UI preview)
+const LANG={en:{home:'Home',share:'Share',access:'Access',desk:'Desk',more:'More',myhealth:'My Health',shareBtn:'Share with a clinic',hello:'Hello'},hi:{home:'होम',share:'साझा करें',access:'एक्सेस',desk:'क्लिनिक',more:'और',myhealth:'मेरा स्वास्थ्य',shareBtn:'क्लिनिक के साथ साझा करें',hello:'नमस्ते'},mr:{home:'मुख्यपृष्ठ',share:'शेअर',access:'ॲक्सेस',desk:'क्लिनिक',more:'अधिक',myhealth:'माझे आरोग्य',shareBtn:'क्लिनिकसोबत शेअर करा',hello:'नमस्कार'}};
+const T=k=>(LANG[S.lang||'en']||LANG.en)[k]||LANG.en[k];
+// ---- toast / push
+function toast(m,ms){let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}e.textContent=m;e.className='show';clearTimeout(toast.t);toast.t=setTimeout(()=>e.className='',ms||2400)}
+function push(title,body){let e=document.getElementById('push');if(!e){e=document.createElement('div');e.id='push';document.body.appendChild(e)}e.innerHTML=`<div class=pi><i></i></div><div><b>${esc(title)}</b><div>${esc(body)}</div></div>`;e.className='show';clearTimeout(push.t);push.t=setTimeout(()=>e.className='',4200)}
+// ---- items (extended)
+const _items0=items0;
+function items(k){
+ if(k=='vitals'){const v=S.vitals;if(!v||!v.bp)return [];return ['Blood pressure 30-day average: '+avg(v.bp.slice(-30).map(x=>x.sys))+'/'+avg(v.bp.slice(-30).map(x=>x.dia)),'Resting heart rate: '+avg(v.hr.slice(-30).map(x=>x.v))+' bpm','Sleep: '+(avg(v.sleep.slice(-30).map(x=>x.v*10))/10).toFixed(1)+' h a night','Steps: '+avg(v.steps.slice(-30).map(x=>x.v)).toLocaleString()+' a day','Weight: '+v.weight[v.weight.length-1].v+' kg']}
+ if(k=='documents')return (S.docs||[]).filter(d=>d.attach).map(d=>d.name+' ('+d.type+')');
+ return _items0(k);
+}
+const avg=a=>Math.round(a.reduce((s,x)=>s+x,0)/(a.length||1));
+// ---- route + nav
+const route=()=>{const x=location.hash.slice(1);return VIEWS[x.split('/')[0]]?x:(S.onboarded?'home':'welcome')};
+const IC4={home:'M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z',share:'M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13',log:'M7 3h10a1 1 0 011 1v17l-3-2-3 2-3-2-3 2V4a1 1 0 011-1zM9 8h6M9 12h6',desk:'M3 21V8l9-5 9 5v13M9 21v-6h6v6M12 8v3M10.5 9.5h3'};
+const sv=k=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IC4[k]}"/></svg>`;
+const IC2={more:'M5 12h.01M12 12h.01M19 12h.01'};
+function setNav(r){
+ const t=[['home','home',T('home')],['share','share',T('share')],['log','log',T('access')],['desk','desk',T('desk')],['more','more',T('more')]];
+ const ic=k=>k=='more'?`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="${IC2.more}"/></svg>`:sv(k);
+ const base=r.split('/')[0];const grp={meds:'more',vault:'more',vitals:'more',emergency:'more',privacy:'more',family:'more',policy:'more'}[base]||base;
+ $('#nav').innerHTML=S.onboarded?t.map(x=>`<a href="#${x[0]}" class="${grp==x[0]?'on':''}"><span>${ic(x[1])}</span>${x[2]}</a>`).join(''):'';
+ $('#mode').textContent=base=='desk'?'Clinic view':'Demo mode';
+}
+let lastR='';
+function render(){const r=route();setNav(r);const v=VIEWS[r.split('/')[0]]||VIEWS.home;const app=$('#app');const same=lastR==r;lastR=r;app.classList.toggle('still',same);app.innerHTML=v(r);if(!same)window.scrollTo(0,0);[...app.children].forEach((e,i)=>e.style.setProperty('--i',i));if(AFTER[r])AFTER[r]()}
+// ---- expiry/deletions
+function audit(m){(S.audit=S.audit||[]).unshift({at:Date.now(),m})}
+function expire(){const n=Date.now();let ch=0;S.checkins.forEach(c=>{if(['sent','opened','reviewed'].includes(c.status)&&c.expires<n){c.status='expired';c.bundle={};if(!c.other)S.log.unshift({at:n,clinic:c.clinicName,act:'auto-deleted at expiry',id:c.id});audit('Auto-deleted bundle '+c.code+' at expiry (retention rule)');ch=1}});(S.dels||[]).forEach(d=>{if(d.status=='requested'&&n-d.at>4500)honorDel(d.id,1)});if(ch)save()}
+function requestDelete(id){const c=S.checkins.find(x=>x.id==id);if(!c)return;S.dels=S.dels||[];if(S.dels.find(d=>d.ciId==id&&d.status=='requested'))return;const d={id:'d'+Date.now(),ciId:id,clinic:c.clinic,clinicName:c.clinicName,at:Date.now(),status:'requested',code:c.code};S.dels.unshift(d);S.log.unshift({at:Date.now(),clinic:c.clinicName,act:'deletion requested',id});audit('Deletion requested by patient for check-in '+c.code);save();render();toast('Deletion request sent to '+c.clinicName);setTimeout(()=>{honorDel(d.id,1)},4500)}
+function honorDel(did,auto){const d=(S.dels||[]).find(x=>x.id==did);if(!d||d.status!='requested')return;const c=S.checkins.find(x=>x.id==d.ciId);d.status='deleted';d.doneAt=Date.now();d.ref='DEL-'+new Date().getFullYear()+'-'+String(Math.floor(1000+Math.random()*9000));if(c){c.bundle={};c.status='deleted'}S.log.unshift({at:Date.now(),clinic:d.clinicName,act:'deleted by clinic',id:d.ciId});audit((auto?'Auto-honored':'Honored')+' deletion '+d.ref+' for check-in '+d.code);save();if(route().match(/^(log|desk)/))render();toast(d.clinicName+' confirmed deletion ('+d.ref+')')}
+function deleteAllClinics(){const act=S.checkins.filter(c=>!c.other&&['sent','opened','reviewed'].includes(c.status));if(!act.length){toast('Nothing left at any clinic');return}act.forEach((c,i)=>setTimeout(()=>requestDelete(c.id),i*300))}
+// ---- demo data
+function demo(){
+ const R=rng(7),now=Date.now();
+ S.basics={name:'Aarohi Patil',dob:'2001-05-14',blood:'B+',phone:'+91 90000 12345',contact:'Meera Patil (mother), +91 90000 00000'};
+ S.allergies=['Penicillin (rash)','Peanuts (swelling)','Sulfa drugs (mild)'];
+ S.medicines=[{name:'Cetirizine',dose:'10 mg, once at night',times:['21:30'],reason:'Seasonal allergy',by:'Dr. Rao',start:'Mar 2026',stock:18,per:1,conf:'2 Oct'},{name:'Salbutamol inhaler',dose:'2 puffs when needed',times:[],reason:'Mild asthma',by:'Dr. Rao',start:'Jan 2024',stock:120,per:0,conf:'2 Oct'},{name:'Vitamin D3',dose:'60,000 IU, weekly',times:['09:00'],reason:'Low vitamin D',by:'Dr. Kulkarni',start:'Aug 2026',stock:5,per:1,conf:'28 Sep'},{name:'Iron + folic acid',dose:'1 tablet, morning',times:['08:00'],reason:'Mild anaemia',by:'Dr. Kulkarni',start:'Aug 2026',stock:9,per:1,conf:'28 Sep'}];
+ S.medHistory=[{name:'Amoxicillin',why:'Stopped: rash (allergy noted)',when:'Feb 2025'},{name:'Montelukast',why:'Completed 3-month course',when:'Oct-Dec 2025'}];
+ S.conditions=['Mild asthma','Seasonal allergic rhinitis','Mild iron-deficiency anaemia'];
+ S.surgeries=['Appendix removed (2019)','Wisdom tooth extraction (2023)'];
+ S.sensitive=['Anxiety, on counselling'];
+ S.famHistory=['Father: type 2 diabetes','Mother: hypertension','Grandmother: asthma'];
+ S.immun=[['COVID-19 booster','Jan 2024'],['Tetanus (Td)','Mar 2023'],['Hepatitis B','Complete'],['HPV dose 2','Sep 2022']];
+ // adherence 14d
+ S.adh=Array.from({length:14},(_,i)=>Math.min(100,Math.round(70+R()*30)));S.todayLog={};S.todayKey=new Date().toDateString();S.remind=true;
+ // vitals 90d
+ const ser=(base,amp,n,dec)=>Array.from({length:n},(_,i)=>({d:now-(n-1-i)*DAY,v:+(base+Math.sin(i/6)*amp+(R()-.5)*amp).toFixed(dec||0)}));
+ S.vitals={bp:Array.from({length:90},(_,i)=>({d:now-(89-i)*DAY,sys:Math.round(116+Math.sin(i/9)*5+R()*6),dia:Math.round(75+Math.sin(i/9)*3+R()*4)})),glucose:ser(94,8,90),weight:ser(58.5,.8,90,1),hr:ser(68,3,90),steps:ser(7400,2200,90),sleep:ser(7.1,.7,90,1),temp:[{d:now-DAY*3,v:98.2}]};
+ S.wear={apple:true,hc:false,last:now-2*HR};
+ // documents
+ S.docs=[{id:'x1',name:'Blood test - CBC & Vit D',type:'Lab report',date:'28 Sep 2026',size:'412 KB',from:'Metropolis Labs',attach:true},{id:'x2',name:'Prescription - Dr. Kulkarni',type:'Prescription',date:'28 Sep 2026',size:'1.1 MB',from:'Greenleaf Clinic',attach:false},{id:'x3',name:'Chest X-ray report',type:'Imaging',date:'3 Jun 2026',size:'2.4 MB',from:'City Imaging',attach:false},{id:'x4',name:'Vaccination certificate',type:'Certificate',date:'10 Jan 2024',size:'220 KB',from:'CoWIN',attach:false},{id:'x5',name:'Dental X-ray (OPG)',type:'Imaging',date:'14 Mar 2026',size:'3.2 MB',from:'Smile Care Dental',attach:false}];
+ S.recon=[{med:'Iron + folic acid',status:'reviewed',note:'Continue 3 months, repeat Hb in November.',doctor:'Dr. Kulkarni',at:now-6*DAY,clinic:'Greenleaf Family Clinic'}];
+ S.profiles=[{n:'Aarohi (you)',rel:'Self',age:25,blood:'B+'},{n:'Meera Patil',rel:'Mother, 54',age:54,blood:'O+',allergies:['Aspirin'],meds:['Amlodipine 5 mg','Metformin 500 mg'],imm:['Influenza (2026)','Tetanus (2022)']},{n:'Kabir Patil',rel:'Brother, 9',age:9,blood:'B+',allergies:['None known'],meds:[],imm:['MMR 2/2','Typhoid (2025)','Hep A 2/2']}];
+ S.prof=0;S.lang=S.lang||'en';S.ret={hrs:24,keepNotes:true,alsoPrint:false};S.wb=false;S.emerg={on:true,show:['blood','allergies','meds','contact']};
+ // check-ins history (mine)
+ S.checkins=[];S.log=[];S.dels=[];S.audit=[];
+ const mk=(id,cl,preset,cats,ago,expH,status,code,bundle,extra)=>{const c=CLINICS.find(x=>x.id==cl);const o=Object.assign({id,clinic:cl,clinicName:c.name,code,at:now-ago,expires:now-ago+expH*HR,status,presetName:preset,cats,bundle,writeback:false},extra||{});S.checkins.push(o);return o};
+ S.onboarded=true;S.demo=true;
+ const b1={basics:items('basics'),allergies:items('allergies'),medicines:items('medicines'),conditions:items('conditions')};
+ const c1=mk('h1','c1','General visit',['Basics','Allergies','Medicines','Conditions'],2*DAY+3*HR,168,'reviewed','3318',b1,{writeback:true});
+ mk('h2','c2','Dentist',['Basics','Allergies','Medicines'],16*DAY,24,'expired','7742',{});
+ mk('h3','c3','Eye doctor',['Basics','Allergies','Conditions'],33*DAY,24,'expired','1096',{});
+ mk('h4','c1','General visit',['Basics','Allergies'],45*DAY,24,'expired','5521',{});
+ const lg=(ago,cl,act)=>S.log.push({at:now-ago,clinic:CLINICS.find(x=>x.id==cl).name,act});
+ lg(2*DAY+3*HR,'c1','sent');lg(2*DAY+2.9*HR,'c1','opened');lg(2*DAY+2.5*HR,'c1','reviewed');lg(16*DAY,'c2','sent');lg(16*DAY-HR,'c2','opened');lg(15*DAY,'c2','auto-deleted at expiry');lg(33*DAY,'c3','sent');lg(33*DAY-2*HR,'c3','opened');lg(32*DAY,'c3','auto-deleted at expiry');lg(45*DAY,'c1','sent');lg(44*DAY,'c1','auto-deleted at expiry');
+ // other patients at the desk (c1)
+ const oth=(id,name,preset,ago,status,code,cats,bundle,wb)=>mk(id,'c1',preset,cats,ago,24,status,code,bundle,{other:true,patient:name,writeback:wb});
+ oth('o1','Rohan Mehta','General visit',12*60000,'sent','4821',['Basics','Allergies','Medicines','Conditions'],{basics:['Name: Rohan Mehta','Age: 34 (DOB 1992-02-11)','Blood group: O+'],allergies:['Latex'],medicines:['Atorvastatin 10 mg - nightly','Telmisartan 40 mg - morning'],conditions:['Hypertension','High cholesterol']},true);
+ oth('o2','Priya Nair','Just my name',31*60000,'opened','2077',['Basics'],{basics:['Name: Priya Nair','Age: 28 (DOB 1998-08-02)','Blood group: A+']},false);
+ oth('o3','Suresh Iyer','Emergency',3*HR,'reviewed','9034',['Basics','Allergies','Medicines','Conditions','Surgeries'],{basics:['Name: Suresh Iyer','Age: 61','Blood group: B-'],allergies:['Sulfa drugs','Iodine contrast'],medicines:['Metformin 1000 mg','Aspirin 75 mg','Ramipril 5 mg'],conditions:['Type 2 diabetes','Coronary artery disease'],surgeries:['CABG (2021)']},true);
+ oth('o4','Ananya Kulkarni','General visit',5*HR,'sent','6150',['Basics','Allergies','Medicines'],{basics:['Name: Ananya Kulkarni','Age: 9 (guardian: Meera Kulkarni)'],allergies:['Egg (mild)'],medicines:['None']},false);
+ S.deskLog=[];audit('Clinic signed in with passkey (Dr. Rao, device Front-desk-tablet)');audit('Poster QR printed (Front desk)');
+ S.deskLog=0;S.lang=S.lang||'en';save();location.hash='home';render();
+}
+// ---- confirmShare with writeback
+function confirmShare(){
+ const cats=Object.keys(sh.on).filter(k=>sh.on[k]&&items(k).length);
+ if(!cats.length){toast('Nothing is switched on to share');return}
+ if(sh.on.sensitive&&!confirm('You are sharing sensitive notes. Continue?'))return;
+ expire();let code;do{code=String(1000+Math.floor(Math.random()*9000))}while(S.checkins.some(c=>c.code==code&&c.status=='sent'));
+ const c=CLINICS.find(x=>x.id==sh.clinic);const bundle={};cats.forEach(k=>bundle[k]=items(k));
+ const ci={id:'ci'+Date.now(),clinic:c.id,clinicName:c.name,code,at:Date.now(),expires:Date.now()+sh.exp*3600000,status:'sent',presetName:PRESETS[sh.preset].n,cats:cats.map(k=>k=='basics'?'Basics':k[0].toUpperCase()+k.slice(1)),bundle,writeback:!!sh.wb};
+ S.checkins.unshift(ci);S.log.unshift({at:Date.now(),clinic:c.name,act:'sent',id:ci.id});audit('Check-in '+code+' received from patient');save();sh.done=ci;sh.bio=0;render()}
+function bioConfirm(){sh.bio=1;render();setTimeout(()=>{sh.bio=2;confirmShare()},1100)}
+// ---- VIEWS
+const sp_=(a,c,w,h)=>{const mn=Math.min(...a),mx=Math.max(...a),r=(mx-mn)||1;const pts=a.map((v,i)=>[i/(a.length-1)*w,h-2-(v-mn)/r*(h-8)]);const d='M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L');return `<svg class=spark viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none"><path d="${d} L${w} ${h} L0 ${h}Z" fill="${c}22"/><path class=ln pathLength="1" d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
+const ring=(p,l)=>`<svg class=ringsvg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="50" stroke="#e6e9e4" stroke-width="12" fill="none"/><circle class=rg cx="60" cy="60" r="50" stroke="#0b0f0e" stroke-width="12" fill="none" stroke-linecap="round" pathLength="100" stroke-dasharray="${p} 100" transform="rotate(-90 60 60)"/><text x="60" y="58" text-anchor="middle" font-size="26" font-weight="800" fill="#0b0f0e">${p}%</text><text x="60" y="78" text-anchor="middle" font-size="11" fill="#6b7571">${l}</text></svg>`;
+const back=(to,t)=>`<a class=bk href="#${to}">← ${t||'More'}</a>`;
+const sw=(on,fn)=>`<label class=sw><input type=checkbox ${on?'checked':''} onchange="${fn}"><i></i></label>`;
+function dayKey(){const k=new Date().toDateString();if(S.todayKey!=k){S.todayKey=k;S.todayLog={}}}
+VIEWS.more=()=>{
+ const tiles=[['meds','Medicines','Reminders, doses, adherence','M10.5 3.5l10 10a4.2 4.2 0 01-6 6l-10-10a4.2 4.2 0 016-6zM8 8l6 6'],['vault','Document vault','Prescriptions, lab reports','M4 5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2zM14 3v6h6'],['vitals','Vitals & trends','BP, sugar, steps, sleep','M3 12h4l3-8 4 16 3-8h4'],['emergency','Emergency card','Lock screen / NFC tag','M12 3l9 16H3zM12 10v4M12 17h.01'],['family','Family & history','Proxy profiles, vaccines','M16 11a3 3 0 100-6 3 3 0 000 6zM8 12a3 3 0 100-6 3 3 0 000 6zM2 20c0-3 3-5 6-5s6 2 6 5M14 15c3 0 8 1 8 5'],['privacy','Privacy & data','Export, FHIR, delete','M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4']];
+ return `<h1>More</h1><p class=mute>Everything else in your record. Demo data throughout.</p>
+ <div class=grid>${tiles.map(t=>`<a class="tile" href="#${t[0]}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0b0f0e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${t[3]}"/></svg><b>${t[1]}</b><small>${t[2]}</small></a>`).join('')}</div>
+ <h2>Language</h2><div class=seg>${[['en','English'],['hi','हिन्दी'],['mr','मराठी']].map(l=>`<button class="${(S.lang||'en')==l[0]?'on':''}" onclick="S.lang='${l[0]}';save();render()">${l[1]}</button>`).join('')}</div><p class=mute style="font-size:14px">UI translation preview: navigation and headings only. Full Hindi and Marathi are planned for v1.</p>
+ <a class="card rowlink" href="#policy"><div><b>Clinic data deletion policy</b><div class=mute style="font-size:15px">How clinics must delete what you shared</div></div><span>›</span></a>
+ <div class=banner>Prototype with sample data. Nothing is sent anywhere.</div>`};
+VIEWS.meds=()=>{
+ dayKey();const doses=[];S.medicines.forEach(m=>(m.times||[]).forEach(t=>doses.push({m:m.name,t,dose:m.dose})));doses.sort((a,b)=>a.t<b.t?-1:1);
+ const done=Object.keys(S.todayLog||{}).length,taken=Object.values(S.todayLog||{}).filter(x=>x=='taken').length;
+ const pct=S.adh?Math.round(([...S.adh,doses.length?Math.round(taken/doses.length*100):100].reduce((a,b)=>a+b,0))/(S.adh.length+1)):0;
+ return back('more')+`<h1>Medicines</h1>
+ <div class="card flexc"><div>${ring(pct,'adherence')}</div><div style="flex:1"><b>Last 14 days</b><div class=bars>${(S.adh||[]).map(v=>`<i style="height:${v*.5}px" class="${v<80?'lo':''}"></i>`).join('')}</div><p class=mute style="font-size:14px">Taken ${taken} of ${doses.length} today</p></div></div>
+ <h2>Today</h2>${doses.length?doses.map(d=>{const k=d.m+'|'+d.t;const s=(S.todayLog||{})[k];return `<div class="card dose ${s||''}"><div class=row style="padding:0"><div class=t><b>${esc(d.m)}</b><small>${d.t} · ${esc(d.dose)}</small></div>${s?`<span class="chip ${s=='taken'?'':'w'}">${s=='taken'?'✓ Taken':'Skipped'}</span><button class="sm sec" onclick="doseSet('${esc(k)}')">Undo</button>`:`<button class="sm" onclick="doseSet('${esc(k)}','taken')">Taken</button><button class="sm sec" onclick="doseSet('${esc(k)}','skipped')">Skip</button>`}</div></div>`}).join(''):'<p class=mute>No scheduled doses.</p>'}
+ <div class=card><div class=row style="padding-top:0"><div class=t><b>Reminders</b><small>Web Push at dose times</small></div>${sw(S.remind,"S.remind=this.checked;save();toast(this.checked?'Reminders on':'Reminders off')")}</div><button class=sec onclick="push('TapChart reminder','Time for Iron + folic acid (8:00)')">Preview a reminder</button></div>
+ <h2>Your medicines</h2>${S.medicines.map(m=>{const low=m.per&&m.stock<10;return `<div class=card><div class=row style="padding:0 0 6px"><div class=t><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></div>${low?'<span class="chip w">Refill soon</span>':''}</div><p class=mute style="font-size:14px">${esc(m.reason||'')} · prescribed by ${esc(m.by||'you')} · since ${esc(m.start||'')}<br>Added by you · last confirmed ${esc(m.conf||'today')}</p>${m.per?`<div class=stock><i style="width:${Math.min(100,m.stock*4)}%" class="${low?'lo':''}"></i></div><small class=mute>${m.stock} left · refill reminder ${low?'sent today':'in '+(m.stock-7)+' days'}</small>`:''}</div>`}).join('')}
+ <h2>From your doctors</h2>${(S.recon||[]).length?S.recon.map(r=>`<div class="card sens2"><b>${esc(r.med)}</b> <span class="chip ${r.status=='stopped'?'r':r.status=='changed'?'w':''}">${r.status}</span><p>${esc(r.note||'')}</p><small class=mute>${esc(r.doctor)} · ${esc(r.clinic)} · ${fmtD(r.at)} · you can accept or undo</small></div>`).join(''):'<p class=mute>Updates sent back by a clinic appear here, only if you allow write-back when sharing.</p>'}
+ <h2>Add a medicine</h2><div class=card><input id=nm list=drugs placeholder="Start typing (generic or brand)"><datalist id=drugs>${['Paracetamol (Crocin, Dolo)','Metformin (Glycomet)','Amlodipine (Amlong)','Atorvastatin (Lipitor)','Cetirizine (Zyrtec)','Pantoprazole (Pan 40)','Levothyroxine (Thyronorm)','Azithromycin (Azithral)','Ibuprofen (Brufen)','Omeprazole (Omez)'].map(x=>`<option value="${x}">`).join('')}</datalist><input id=nd placeholder="Dose, e.g. 500 mg twice daily"><button onclick="addMed2()">Add medicine</button><small class=mute>Drug dictionary is a small sample. No interaction checks in v1.</small></div>
+ <h2>Medicine history</h2><div class=card>${(S.medHistory||[]).map(h=>`<div class=row><div class=t>${esc(h.name)}<small>${esc(h.why)}</small></div><span class="chip g">${esc(h.when)}</span></div>`).join('')||'<p class=mute>None.</p>'}</div>`};
+function doseSet(k,s){dayKey();if(s)S.todayLog[k]=s;else delete S.todayLog[k];save();render()}
+function addMed2(){const n=$('#nm').value.trim();if(!n)return;S.medicines.push({name:n.split(' (')[0],dose:$('#nd').value.trim(),times:['09:00'],reason:'',by:'you',start:'Today',stock:30,per:1,conf:'today'});save();toast('Added '+n.split(' (')[0]);render()}
+VIEWS.vault=()=>{const docs=S.docs||[];return back('more')+`<h1>Document vault</h1><p class=mute>Encrypted on your device in the real app. Choose which documents ride along when you share.</p>
+ <button onclick="scanDoc()">+ Scan a prescription</button><div id=scan></div>
+ ${docs.map(d=>`<div class="card doc"><div class=row style="padding:0"><div class=ficon>${d.type[0]}</div><div class=t><b>${esc(d.name)}</b><small>${esc(d.type)} · ${esc(d.date)} · ${esc(d.size)}<br>${esc(d.from)}</small></div></div><div class=row style="padding:10px 0 0"><div class=t><small>Attach to shares</small></div>${sw(d.attach,`docAttach('${d.id}',this.checked)`)}<button class="sm danger" onclick="docDel('${d.id}')">Delete</button></div></div>`).join('')}
+ <div class=banner>Documents you attach appear in the share preview as their own switch. Sample files only.</div>`};
+function docAttach(id,v){S.docs.find(d=>d.id==id).attach=v;save();toast(v?'Will attach to shares':'Removed from shares')}
+function docDel(id){S.docs=S.docs.filter(d=>d.id!=id);save();render()}
+function scanDoc(){const e=$('#scan');e.innerHTML='<div class="card scanbox"><div class=scanline></div><b>Scanning prescription…</b><div class=mute id=sst>Reading handwriting</div></div>';setTimeout(()=>{const s=$('#sst');if(s)s.textContent='Found: Azithromycin 500 mg, once daily x 3 days'},1100);setTimeout(()=>{S.docs.unshift({id:'x'+Date.now(),name:'Prescription - scanned today',type:'Prescription',date:fmtD(Date.now())+' 2026',size:'860 KB',from:'You (camera)',attach:false});save();toast('Saved. Please confirm the medicine details.');render()},2400)}
+VIEWS.vitals=()=>{const v=S.vitals;if(!v)return back('more')+'<h1>Vitals</h1><p class=mute>Load sample data to see trends.</p>';const rg=S.vr||30;const cut=a=>a.slice(-rg);
+ const card=(t,a,c,u,last)=>`<div class=card><div class=row style="padding:0"><div class=t><b>${t}</b><small>${rg}-day trend</small></div><div class=vv>${last}<small>${u}</small></div></div>${sp_(cut(a),c,300,56)}</div>`;
+ return back('more')+`<h1>Vitals & trends</h1><div class=seg>${[7,30,90].map(n=>`<button class="${rg==n?'on':''}" onclick="S.vr=${n};save();render()">${n} days</button>`).join('')}</div>
+ ${card('Blood pressure',v.bp.map(x=>x.sys),'#0b0f0e','mmHg',v.bp[89].sys+'/'+v.bp[89].dia)}${card('Resting heart rate',v.hr.map(x=>x.v),'#ef4444','bpm',v.hr[89].v)}${card('Blood glucose (fasting)',v.glucose.map(x=>x.v),'#f59e0b','mg/dL',v.glucose[89].v)}${card('Weight',v.weight.map(x=>x.v),'#0f766e','kg',v.weight[89].v)}${card('Steps',v.steps.map(x=>x.v),'#65a30d','a day',v.steps[89].v.toLocaleString())}${card('Sleep',v.sleep.map(x=>x.v),'#6366f1','h',v.sleep[89].v)}
+ <h2>Log a reading</h2><div class=card><select id=vt><option value=bp>Blood pressure</option><option value=glucose>Glucose</option><option value=weight>Weight</option><option value=temp>Temperature (°F)</option></select><input id=vv inputmode=decimal placeholder="Value, e.g. 118/76 or 94"><button onclick="addVital()">Save reading</button></div>
+ <h2>Sources</h2><div class=card><div class=row style="padding-top:0"><div class=t>Apple Health export<small>${S.wear&&S.wear.apple?'Imported 90 days · '+fmtDT(S.wear.last):'Not imported'}</small></div><button class="sm sec" onclick="importHealth()">Import file</button></div><div class=row><div class=t>Health Connect (Android)<small>Needs the native app (planned)</small></div><span class="chip g">Soon</span></div><div id=imp></div></div>
+ <div class=banner>Only summaries (averages) are shared with a clinic, never raw streams. This app records and shows data. It does not interpret it or give medical advice.</div>`};
+function addVital(){const t=$('#vt').value,x=$('#vv').value.trim();if(!x)return;const v=S.vitals;if(t=='bp'){const m=x.match(/(\d+)\D+(\d+)/);if(!m){toast('Enter like 118/76');return}v.bp.push({d:Date.now(),sys:+m[1],dia:+m[2]})}else if(t=='temp')v.temp.push({d:Date.now(),v:+x});else v[t].push({d:Date.now(),v:+x});save();toast('Reading saved');render()}
+function importHealth(){$('#imp').innerHTML='<div class=prog style="margin-top:12px"><div id=ip style="width:0;transition:width 1.6s"></div></div><small class=mute id=it>Reading export.zip…</small>';setTimeout(()=>{$('#ip').style.width='100%'},30);setTimeout(()=>{S.wear={apple:true,hc:false,last:Date.now()};save();toast('Imported 90 days of summaries');render()},1800)}
+VIEWS.emergency=()=>{const e=S.emerg||{on:true,show:['blood','allergies','meds','contact']};const b=S.basics;const has=k=>e.show.includes(k);
+ let q='';const R=rng(11);for(let y=0;y<21;y++)for(let x=0;x<21;x++){const fin=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);if(fin){const ex=x<7?x:x-14,ey=y<7?y:y-14;const on=ex==0||ex==6||ey==0||ey==6||(ex>1&&ex<5&&ey>1&&ey<5);if(on)q+=`<rect x=${x} y=${y} width=1 height=1 />`}else if(R()>.52)q+=`<rect x=${x} y=${y} width=1 height=1 />`}
+ return back('more')+`<h1>Emergency card</h1><p class=mute>Minimal info a first responder can read from your lock screen or an NFC tag. You choose every line.</p>
+ <div class="ecard"><div class=ehead><b>EMERGENCY</b><span>${esc(b.name||'')}</span></div>${has('blood')?`<div class=erow><small>Blood group</small><b>${esc(b.blood||'-')}</b></div>`:''}${has('allergies')?`<div class=erow><small>Allergies</small><b>${S.allergies.map(esc).join(', ')||'None recorded'}</b></div>`:''}${has('meds')?`<div class=erow><small>Key medicines</small><b>${S.medicines.slice(0,3).map(m=>esc(m.name)).join(', ')}</b></div>`:''}${has('contact')?`<div class=erow><small>Contact</small><b>${esc(b.contact||'-')}</b></div>`:''}<div class=eqr><svg viewBox="0 0 21 21" width="96" height="96">${q}</svg><small>Scan or tap tag</small></div></div>
+ <div class=card>${[['blood','Blood group'],['allergies','Allergies'],['meds','Key medicines'],['contact','Emergency contact']].map(a=>`<div class=row><div class=t>${a[1]}</div>${sw(has(a[0]),`emToggle('${a[0]}',this.checked)`)}</div>`).join('')}</div>
+ <div class=card><div class=row style="padding-top:0"><div class=t><b>Show on lock screen</b><small>Medical ID style, read-only</small></div>${sw(e.on,"S.emerg.on=this.checked;save()")}</div><button class=sec onclick="toast('Tag written (demo). Real NFC writing needs Android Chrome.')">Write to NFC tag</button></div>`};
+function emToggle(k,v){const e=S.emerg;e.show=e.show.filter(x=>x!=k);if(v)e.show.push(k);save();render()}
+VIEWS.family=()=>{const p=S.profiles||[];return back('more')+`<h1>Family & history</h1><h2>Profiles you manage</h2>${p.map((x,i)=>`<div class="card prof ${S.prof==i?'cur':''}"><div class=row style="padding:0"><div class=avatar>${x.n[0]}</div><div class=t><b>${esc(x.n)}</b><small>${esc(x.rel)} · Blood ${esc(x.blood)}</small></div>${S.prof==i?'<span class=chip>Viewing</span>':`<button class="sm sec" onclick="S.prof=${i};save();toast('Switched to ${esc(x.n)} (demo: details shown below)');render()">Switch</button>`}</div>${x.allergies?`<p class=mute style="font-size:14px;margin-top:8px">Allergies: ${x.allergies.join(', ')}<br>Medicines: ${x.meds.join(', ')||'none'}<br>Vaccines: ${x.imm.join(', ')}</p>`:''}</div>`).join('')}<p class=mute style="font-size:14px">Guardian flows need legal review before launch.</p>
+ <h2>Family history</h2><div class=card>${(S.famHistory||[]).map(x=>`<div class=row>${esc(x)}</div>`).join('')||'<p class=mute>None.</p>'}</div>
+ <h2>Immunisations</h2><div class=card>${(S.immun||[]).map(x=>`<div class=row><div class=t>${esc(x[0])}</div><span class="chip g">${esc(x[1])}</span></div>`).join('')||'<p class=mute>None.</p>'}</div>`};
+function fhir(){const b=S.basics;return {resourceType:'Bundle',type:'collection',timestamp:new Date().toISOString(),entry:[{resource:{resourceType:'Patient',name:[{text:b.name}],birthDate:b.dob,telecom:[{system:'phone',value:b.phone}]}},...S.allergies.map(a=>({resource:{resourceType:'AllergyIntolerance',code:{text:a},patient:{display:b.name}}})),...S.medicines.map(m=>({resource:{resourceType:'MedicationStatement',status:'active',medicationCodeableConcept:{text:m.name},dosage:[{text:m.dose}]}})),...S.conditions.map(c=>({resource:{resourceType:'Condition',code:{text:c}}}))]}}
+function dl(name,obj){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('Downloaded '+name)}
+VIEWS.privacy=()=>{const act=S.checkins.filter(c=>!c.other&&['sent','opened','reviewed'].includes(c.status)).length;return back('more')+`<h1>Privacy & data</h1>
+ <div class="card"><b>Your data, your call</b><p class=mute>Hosted in India (AWS Mumbai) in the real product. Encrypted so only you and the clinic you pick can read it. DPDP Act: consent, notice and withdrawal are built in. Confirm with a lawyer before launch.</p></div>
+ <div class=card><div class=row style="padding-top:0"><div class=t><b>Export my data</b><small>JSON file, yours to keep</small></div><button class="sm sec" onclick="dl('tapchart-export.json',{exported:new Date().toISOString(),basics:S.basics,allergies:S.allergies,medicines:S.medicines,conditions:S.conditions,surgeries:S.surgeries,documents:S.docs,log:S.log})">Download</button></div><div class=row><div class=t><b>FHIR R4 bundle</b><small>For doctors and hospital systems</small></div><button class="sm sec" onclick="dl('tapchart-fhir.json',fhir())">Download</button></div></div>
+ <div class="card sens2"><b>Delete my data from clinics</b><p class=mute>${act} share(s) still held by clinics. Clinics must delete within 72 hours and send you a certificate.</p><button class=danger onclick="deleteAllClinics()">Request deletion from all clinics</button><a class=lk href="#policy">Read the deletion policy</a></div>
+ <div class=card><b>Consent history</b>${S.checkins.filter(c=>!c.other).slice(0,4).map(c=>`<div class=row><div class=t>${esc(c.clinicName)}<small>${esc(c.presetName)} · ${fmtD(c.at)}</small></div><span class="chip g">${c.status}</span></div>`).join('')}</div>
+ <div class=card><b>Delete my account</b><p class=mute>Removes everything on this device and asks every clinic to delete your shares.</p><button class=danger onclick="if(confirm('Delete account and all data? This cannot be undone.')){deleteAllClinics();setTimeout(()=>{ls.del();S=structuredClone(blank);location.hash='welcome';render()},900)}">Delete account</button></div>`};
+VIEWS.policy=()=>{return back('more')+`<h1>Clinic data deletion policy</h1><p class=mute>Applies to every verified clinic on TapChart. Demo wording, not legal advice.</p>
+ <div class="card steps">${[['You ask','Tap "Delete from clinic" on any share, or delete from all clinics. Withdrawing consent is as easy as giving it.'],['Clinic is told at once','The request lands in the clinic dashboard and the encrypted bundle on our servers is removed immediately.'],['Clinic deletes within 72 hours','Any copy in the clinic system must go: downloads, FHIR imports and print records.'],['You get a certificate','A reference number and time. Not honoured in 72 hours? It is flagged and the clinic risks losing its Verified badge.'],['What can stay','A minimal audit line (who, when) and the doctor\u2019s own clinical note if one was saved, kept only as long as medical-records law requires.']].map((s,i)=>`<div class=st><i>${i+1}</i><div><b>${s[0]}</b><div class=mute style="font-size:16px">${s[1]}</div></div></div>`).join('')}</div>
+ <div class=banner>By default shares auto-delete after 24 hours. Copies a clinic already printed or downloaded sit outside our technical control, which is why clinics accept this policy to get verified.</div>
+ <button onclick="location.hash='log'">See my shares</button>`};
+VIEWS.log=()=>{expire();const mine=S.checkins.filter(c=>!c.other);const act=mine.filter(c=>['sent','opened','reviewed'].includes(c.status));const past=mine.filter(c=>!['sent','opened','reviewed'].includes(c.status));
+ const dl_=id=>(S.dels||[]).find(d=>d.ciId==id);
+ const cert=d=>d&&d.status=='deleted'?`<div class=cert><div class=ck>✓</div><div><b>Deleted by ${esc(d.clinicName)}</b><div class=mute style="font-size:14px">Ref ${d.ref} · ${fmtDT(d.doneAt)}<br>Removed: shared bundle, cached copies. Kept: audit line.</div></div></div>`:'';
+ return `<h1>Access log</h1><p class=mute>Who saw what, and when. ${S.demo?'Sample history.':''}</p>
+ <h2>Active shares</h2>${act.length?act.map(c=>{const d=dl_(c.id);return `<div class=card><div class=row style="padding:0"><b>${esc(c.clinicName)}</b><span class="chip ${c.status=='sent'?'w':''}">${c.status}</span></div><p class=mute>Code ${c.code} · ${esc(c.presetName)}<br>Expires ${fmtDT(c.expires)}${c.writeback?' · write-back allowed':''}</p><div>${c.cats.map(k=>`<span class=chip>${k}</span>`).join('')}</div>${d&&d.status=='requested'?`<div class=pend><i></i> Deletion requested. Waiting for clinic…</div>`:`<div class=btnrow><button class=danger onclick="revoke('${c.id}')">Revoke</button><button class=sec onclick="requestDelete('${c.id}')">Delete from clinic</button></div>`}</div>`}).join(''):'<p class=mute>No active shares.</p>'}
+ <h2>Past shares</h2>${past.length?past.map(c=>{const d=dl_(c.id);return `<div class=card><div class=row style="padding:0"><b>${esc(c.clinicName)}</b><span class="chip g">${c.status=='deleted'?'deleted':c.status}</span></div><p class=mute style="margin:4px 0">${esc(c.presetName)} · ${fmtD(c.at)} · code ${c.code}</p>${d?cert(d):c.status=='expired'?'<div class=cert><div class=ck>✓</div><div><b>Auto-deleted at expiry</b><div class=mute style="font-size:14px">Clinic retention rule: 24 hours</div></div></div>':c.status=='revoked'?'<div class=cert><div class=ck>✓</div><div><b>Revoked by you</b><div class=mute style="font-size:14px">Bundle removed immediately</div></div></div>':''}</div>`}).join(''):'<p class=mute>Nothing yet.</p>'}
+ <h2>Timeline</h2><div class=card>${[...S.log].sort((a,b)=>b.at-a.at).slice(0,14).map(l=>`<div class=row><div class=t>${esc(l.clinic)}<small>${fmtDT(l.at)}</small></div><span class="chip ${/revoked|discard/.test(l.act)?'r':/delet|expired/.test(l.act)?'g':''}">${l.act}</span></div>`).join('')||'<p class=mute>Nothing yet.</p>'}</div>
+ <a class="card rowlink" href="#policy"><div><b>Deletion policy</b><div class=mute style="font-size:15px">What clinics must do when you ask</div></div><span>›</span></a>`};
+// ---- Desk
+function deskList(cl){return S.checkins.filter(x=>x.clinic==cl&&['sent','opened','reviewed'].includes(x.status))}
+VIEWS.desk=()=>{expire();const cl=desk.clinic||'c1';desk.tab=desk.tab||'in';
+ const open=desk.open&&S.checkins.find(x=>x.id==desk.open&&['sent','opened','reviewed'].includes(x.status));
+ if(open)return deskOpen(open);
+ const tabs=[['in','Check-ins'],['ret','Retention'],['aud','Audit'],['pos','Poster']];
+ const dels=(S.dels||[]).filter(d=>d.clinic==cl);const pend=dels.filter(d=>d.status=='requested');
+ let body='';
+ if(desk.tab=='in'){const list=deskList(cl);body=`${pend.map(d=>`<div class="card delreq"><div class=row style="padding:0"><div class=t><b>Deletion request</b><small>Patient asked to delete check-in ${d.code} · ${fmtDT(d.at)}</small></div></div><p class=mute style="font-size:15px">Due within 72 h. Demo: auto-honoured in seconds.</p><button onclick="honorDel('${d.id}')">Honour now & issue certificate</button></div>`).join('')}
+ <h2>Incoming check-ins</h2>${list.length?list.map(x=>`<div class="card ci"><div class=row style="padding:0"><div class=big>${x.code}</div><span class="chip ${x.status=='sent'?'w':''}">${x.status=='sent'?'new':x.status}</span></div><p class=mute style="margin:6px 0">${x.patient?esc(x.patient)+' · ':'Aarohi Patil (demo) · '}${fmtDT(x.at)} · ${esc(x.presetName)} · ${x.cats.length} categories</p><button onclick="openC('${x.id}')">Open summary</button></div>`).join(''):'<p class=mute>No check-ins waiting.</p>'}
+ ${dels.filter(d=>d.status=='deleted').map(d=>`<div class=cert><div class=ck>✓</div><div><b>Deleted ${d.code}</b><div class=mute style="font-size:14px">Cert ${d.ref} · ${fmtDT(d.doneAt)}</div></div></div>`).join('')}`}
+ else if(desk.tab=='ret'){const r=S.ret||{hrs:24,keepNotes:true};body=`<div class=card><b>Retention rules</b><p class=mute style="font-size:15px">Required to stay verified. Applied automatically.</p><label class=f>Delete incoming bundles after</label><select onchange="S.ret.hrs=+this.value;save();audit('Retention changed to '+this.value+' h');toast('Saved')">${[[24,'24 hours (default)'],[72,'72 hours'],[168,'7 days']].map(o=>`<option value=${o[0]} ${r.hrs==o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><div class=row><div class=t>Clinic's own visit notes<small>Kept 3 years per record-keeping law (editable by doctor)</small></div>${sw(r.keepNotes,"S.ret.keepNotes=this.checked;save()")}</div><div class=row><div class=t>Honour patient deletion requests<small>Always on. Within 72 hours.</small></div>${sw(true,"this.checked=true;toast('Required for Verified status')")}</div></div>
+ <div class=card><b>Deletion SLA this month</b><div class=kpis><div><b>${(S.dels||[]).length}</b><small>requests</small></div><div><b>${(S.dels||[]).filter(d=>d.status=='deleted').length}</b><small>honoured</small></div><div><b>0</b><small>overdue</small></div></div><p class=mute style="font-size:14px">Overdue requests are flagged to TapChart and can cost the Verified badge.</p></div>`}
+ else if(desk.tab=='aud'){body=`<div class=card><b>Audit log</b><p class=mute style="font-size:15px">Who did what. Contains no patient health data.</p>${(S.audit||[]).slice(0,25).map(a=>`<div class=row><div class=t>${esc(a.m)}<small>${fmtDT(a.at)}</small></div></div>`).join('')||'<p class=mute>Empty.</p>'}</div>`}
+ else{let q='';const R=rng(5);for(let y=0;y<25;y++)for(let x=0;x<25;x++){const fin=(x<7&&y<7)||(x>17&&y<7)||(x<7&&y>17);if(fin){const ex=x<7?x:x-18,ey=y<7?y:y-18;if(ex==0||ex==6||ey==0||ey==6||(ex>1&&ex<5&&ey>1&&ey<5))q+=`<rect x=${x} y=${y} width=1 height=1 />`}else if(R()>.5)q+=`<rect x=${x} y=${y} width=1 height=1 />`}
+ body=`<div class="card poster"><b>Tap or scan to check in</b><svg viewBox="0 0 25 25" width="200" height="200">${q}</svg><div class=big style="margin:6px auto;width:max-content">Clinic code 1001</div><small class=mute>${CLINICS.find(c=>c.id==cl).name} · Verified</small></div><button onclick="audit('Poster printed');toast('Poster PDF generated (demo)')">Download poster PDF</button>`}
+ return `<h1>Clinic desk</h1><label class=f>Viewing as</label><select onchange="desk.clinic=this.value;render()">${CLINICS.map(x=>`<option value=${x.id} ${x.id==cl?'selected':''}>${x.name}</option>`).join('')}</select><div class=seg>${tabs.map(t=>`<button class="${desk.tab==t[0]?'on':''}" onclick="desk.tab='${t[0]}';render()">${t[1]}</button>`).join('')}</div><div class=banner>Demo clinic view. Other patients shown are made up.</div>${body}`};
+function deskOpen(o){const rc=(desk.rc=desk.rc||{});const my=rc[o.id]=rc[o.id]||{};const meds=(o.bundle.medicines||[]);
+ return `<button class="sm sec" onclick="desk.open=null;render()">← Back</button><h1>${esc(o.patient||(o.bundle.basics&&o.bundle.basics[0]?o.bundle.basics[0].replace('Name: ',''):'Patient'))}</h1><p class=mute>Code <b class=big>${o.code}</b> match it to the person at your desk</p>
+ <div class=btnrow><button class=sec onclick="audit('Summary printed for '+'${o.code}');toast('Print dialog opened (demo)')">Print / PDF</button><button class=sec onclick="audit('FHIR downloaded for ${o.code}');dl('fhir-${o.code}.json',fhir())">FHIR R4</button></div>
+ ${Object.entries(o.bundle).map(([k,a])=>`<div class="card ${k=='sensitive'?'sens':''}"><b>${CAT[k]||k}</b>${a.map(x=>`<p>• ${esc(x)}</p>`).join('')}</div>`).join('')}
+ ${meds.length?`<div class=card><b>Reconcile medicines</b><p class=mute style="font-size:14px">Mark each one. ${o.writeback?'Patient allowed write-back.':'Patient has not allowed write-back, so this stays on your side.'}</p>${meds.map(m=>`<div class=recon><div>${esc(m)}</div><div class=seg3>${['reviewed','changed','stopped'].map(s=>`<button class="${my[m]==s?'on '+s:''}" onclick="reconSet('${o.id}','${esc(m).replace(/'/g,'')}','${s}')">${s}</button>`).join('')}</div></div>`).join('')}<label class=f>Visit note</label><textarea id=vn rows=3 style="border-radius:20px" placeholder="Short note for the patient"></textarea><button ${o.writeback?'':'disabled style="opacity:.45"'} onclick="sendBack('${o.id}')">${o.writeback?'Send update to patient':'Write-back not allowed'}</button></div>`:''}
+ <p class=mute style="font-size:14px">Nothing is stored here by default. Expires ${fmtDT(o.expires)}.</p><button onclick="mark('${o.id}','reviewed')">Mark reviewed</button><button class=danger onclick="discard('${o.id}')">Wrong person - discard</button>`}
+function reconSet(id,m,s){desk.rc[id][m]=s;audit('Medicine '+m+' marked '+s);render()}
+function sendBack(id){const o=S.checkins.find(c=>c.id==id);const my=(desk.rc||{})[id]||{};const note=($('#vn')||{}).value||'';const e=Object.entries(my);if(!e.length&&!note){toast('Mark a medicine or add a note first');return}S.recon=S.recon||[];e.forEach(([m,s])=>S.recon.unshift({med:m,status:s,note,doctor:'Dr. Rao',at:Date.now(),clinic:o.clinicName}));if(!e.length)S.recon.unshift({med:'Visit note',status:'reviewed',note,doctor:'Dr. Rao',at:Date.now(),clinic:o.clinicName});audit('Reconciliation sent to patient ('+o.code+')');save();toast('Sent. It now shows in the patient Medicines screen.')}
+// home + share view patches
+const _home=VIEWS.home;
+VIEWS.home=()=>{expire();dayKey();const b=S.basics;const doses=[];S.medicines.forEach(m=>(m.times||[]).forEach(t=>doses.push({m:m.name,t})));const left=doses.filter(d=>!(S.todayLog||{})[d.m+'|'+d.t]);
+ const sec=(k,t,cls)=>{const a=items(k);return `<div class="card"><div class=row style="padding-top:0"><b>${t}</b><button class="sm sec" onclick="edit('${k}')">Edit</button></div>${a.length?a.map(x=>`<span class="chip ${cls||''}">${esc(x)}</span>`).join(''):'<p class=mute>Nothing added yet.</p>'}</div>`};
+ const pr=S.prof&&S.profiles&&S.profiles[S.prof];
+ return `<div class=hid><small style="font-weight:700;letter-spacing:2px;opacity:.7">HEALTH ID ${pr?'· PROXY':''}</small><div style="font-size:28px;font-weight:800;margin:6px 0;letter-spacing:-.5px">${esc(pr?pr.n:(b.name||'Add your name'))}</div><div style="font-weight:600">${pr?pr.rel+' · Blood '+esc(pr.blood):(b.dob?age(b.dob)+' yrs':'')+(b.blood?' · Blood '+esc(b.blood):'')}</div><div style="margin-top:12px">${(pr?(pr.allergies||[]):S.allergies).map(a=>`<span class=al>${esc(a)}</span>`).join('')}</div></div>
+ <button class=pulse onclick="location.hash='share'">${T('shareBtn')}</button>
+ ${S.demo?'<div class=banner>Sample data. Nothing here is a real person or real record.</div>':''}
+ ${left.length?`<a class="card rowlink" href="#meds"><div><b>${left.length} dose${left.length>1?'s':''} left today</b><div class=mute style="font-size:15px">Next: ${esc(left[0].m)} at ${left[0].t}</div></div><span>›</span></a>`:''}
+ ${S.recon&&S.recon.length?`<a class="card rowlink" href="#meds"><div><b>Update from ${esc(S.recon[0].doctor)}</b><div class=mute style="font-size:15px">${esc(S.recon[0].med)}: ${S.recon[0].status}</div></div><span>›</span></a>`:''}
+ ${S.vitals&&S.vitals.bp?`<a class=card href="#vitals" style="display:block;text-decoration:none;color:inherit"><div class=row style="padding:0"><b>Vitals</b><span class=mute>30 days</span></div>${sp_(S.vitals.bp.slice(-30).map(x=>x.sys),'#0b0f0e',300,48)}<small class=mute>BP ${S.vitals.bp[89].sys}/${S.vitals.bp[89].dia} · ${S.vitals.steps[89].v.toLocaleString()} steps</small></a>`:''}
+ ${sec('basics','Basics')}${sec('allergies','Allergies','w')}${sec('medicines','Medicines')}${sec('conditions','Conditions')}${sec('surgeries','Past surgeries','g')}
+ <div class="card sens"><div class=row style="padding-top:0"><b>Sensitive notes</b><button class="sm sec" onclick="edit('sensitive')">Edit</button></div>${S.sensitive.length?S.sensitive.map(x=>`<span class="chip w">${esc(x)}</span>`).join(''):'<p class=mute>Nothing added.</p>'}<p class=mute>Never shared unless you switch it on for a specific visit.</p></div>
+ <button class=ghost onclick="if(confirm('Delete all data on this device?')){ls.del();S=structuredClone(blank);location.hash='welcome';render()}">Delete my data</button>`};
+const _share=VIEWS.share;
+VIEWS.share=(r)=>{if(sh.clinic&&!sh.done){const keys=SHARE_KEYS;const c=CLINICS.find(x=>x.id==sh.clinic);const pk=sh.preset;
+ if(sh.bio==1)return `<div class=bio><div class=fp><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0b0f0e" stroke-width="1.6" stroke-linecap="round"><path d="M12 11v4a3 3 0 01-.6 1.8M8 11a4 4 0 118 0v2.5M5 12a7 7 0 1114 0v1.5c0 2-.4 3.4-1 4.5M8.5 17c.3-1 .5-2 .5-3.5v-2.5"/></svg></div><b>Confirm with fingerprint</b><p class=mute>Demo: confirms automatically</p></div>`;
+ return `<h1>Check in</h1><div class=card><b>${c.name}</b> <span class=chip>✔ Verified clinic</span><p class=mute>${c.city}</p></div>
+ <h2>Who is this visit with?</h2><div>${Object.entries(PRESETS).map(([k,v])=>`<span class="chip ${pk==k?'':'g'} pre" onclick="setPreset('${k}')">${v.n}</span>`).join('')}</div>
+ <h2>This is exactly what they will see</h2><p class=mute>Switch off anything you do not want to share.</p>
+ ${keys.map(k=>{const a=items(k);if(!a.length)return '';const on=sh.on[k];return `<div class="card ${k=='sensitive'?'sens':''}"><div class=row style="padding-top:0"><div class=t><b>${CAT[k]}</b></div><label class=sw><input type=checkbox ${on?'checked':''} onchange="tog('${k}',this.checked)"><i></i></label></div>${on?`<div class=open>${a.map(x=>`<p>• ${esc(x)}</p>`).join('')}</div>`:'<p class=mute>Not shared</p>'}</div>`}).join('')}
+ <label class=f>Keep it available for</label><select onchange="sh.exp=+this.value"><option value=24 ${sh.exp==24?'selected':''}>24 hours (default)</option><option value=4 ${sh.exp==4?'selected':''}>Until visit ends (4 hours)</option><option value=168 ${sh.exp==168?'selected':''}>7 days</option></select>
+ <div class=card><div class=row style="padding:0"><div class=t><b>Allow doctor to send updates back</b><small>Medicine review and visit note. Off by default.</small></div>${sw(sh.wb,"sh.wb=this.checked")}</div></div>
+ <div class=banner>You can ask the clinic to delete this any time (Access tab). Copies a clinic already printed or downloaded are outside our control. <a href="#policy" class=lk>Deletion policy</a></div>
+ <button onclick="bioConfirm()">Confirm and share</button><button class=ghost onclick="sh={};render()">Cancel</button>`}
+ return _share(r)};
+function setPreset(k){sh.preset=k;sh.on={};SHARE_KEYS.forEach(c=>sh.on[c]=PRESETS[k].keys.includes(c)&&c!='sensitive');render()}
+// Hook: after success, desk bundles + log show
+
+let sp=!S.onboarded&&!location.hash;if(sp){document.body.insertAdjacentHTML('beforeend','<div id=splash><div class="logo big"><i></i><b>TapChart</b></div></div>');setTimeout(()=>{const e=$('#splash');e&&e.remove()},1000)}
+render();
+</script></body></html>
